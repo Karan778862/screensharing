@@ -219,20 +219,20 @@ export default function WatchRoom() {
 
   const startScreenShare = async () => {
     try {
-      const stream = await navigator.mediaDevices.getDisplayMedia({ 
-        video: {
-          cursor: 'always',
-          // Limit resolution and frame rate to save internet bandwidth
-          width: { ideal: 1280, max: 1920 },
-          height: { ideal: 720, max: 1080 },
-          frameRate: { ideal: 24, max: 30 }
-        }, 
-        audio: {
-          echoCancellation: false,
-          noiseSuppression: false,
-          sampleRate: 44100
-        } 
-      });
+      let stream;
+      try {
+        // First try with audio (works on PC)
+        stream = await navigator.mediaDevices.getDisplayMedia({ 
+          video: { cursor: 'always' }, 
+          audio: true 
+        });
+      } catch (audioErr) {
+        console.log("Failed to get display media with audio, falling back to video only (Mobile behavior)", audioErr);
+        // Fallback for mobile devices that don't support system audio capture
+        stream = await navigator.mediaDevices.getDisplayMedia({ 
+          video: true 
+        });
+      }
       
       localStreamRef.current = stream;
       
@@ -246,8 +246,6 @@ export default function WatchRoom() {
       const pc = createPeerConnection();
       stream.getTracks().forEach(track => pc.addTrack(track, stream));
 
-      // Negotiation is handled by onnegotiationneeded
-
       // Handle stream end
       stream.getVideoTracks()[0].onended = () => {
         stopScreenShare();
@@ -255,7 +253,8 @@ export default function WatchRoom() {
 
     } catch (err) {
       console.error("Error sharing screen: ", err);
-      setStatus('Failed to share screen. Ensure you granted permissions.');
+      setStatus('Failed to share screen. Device might not support it.');
+      alert('Screen sharing failed. Some mobile browsers do not support screen sharing. Try using a laptop/PC.');
     }
   };
 
