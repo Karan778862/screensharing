@@ -219,6 +219,11 @@ export default function WatchRoom() {
 
   const startScreenShare = async () => {
     try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+        alert("Aapka browser screen sharing support nahi karta. Kripya is link ko direct Chrome ya Safari mein open karein (WhatsApp ke andar nahi).");
+        return;
+      }
+
       let stream;
       try {
         // First try with audio (works on PC)
@@ -253,8 +258,8 @@ export default function WatchRoom() {
 
     } catch (err) {
       console.error("Error sharing screen: ", err);
-      setStatus('Failed to share screen. Device might not support it.');
-      alert('Screen sharing failed. Some mobile browsers do not support screen sharing. Try using a laptop/PC.');
+      setStatus('Failed to share screen: ' + err.message);
+      alert('Screen share error: ' + err.message + '\n\nAgar aap mobile par hain, toh Chrome ya Safari use karein.');
     }
   };
 
