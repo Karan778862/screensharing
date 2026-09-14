@@ -3,7 +3,7 @@ import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { MonitorUp, Volume2, VolumeX, Maximize, X, MessageSquare, Send, Mic, MicOff } from 'lucide-react';
 
-const SOCKET_SERVER_URL = 'http://localhost:5000'; // Update for production
+const SOCKET_SERVER_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000'; // Update for production
 
 export default function WatchRoom() {
   const { roomId } = useParams();
