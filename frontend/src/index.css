@@ -354,5 +354,19 @@ video {
     padding: 0.6rem 1.2rem;
     font-size: 0.9rem;
   }
+  
+  .main-content-area {
+    flex-direction: column !important;
+  }
+
+  .chat-container {
+    width: 100% !important;
+    height: 300px;
+  }
+  
+  .controls-bar {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
 }
 

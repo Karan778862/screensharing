@@ -326,12 +326,24 @@ export default function WatchRoom() {
   };
 
   const toggleFullScreen = () => {
-    if (!document.fullscreenElement) {
-      videoContainerRef.current?.requestFullscreen().catch(err => {
-        console.error(`Error attempting to enable fullscreen: ${err.message}`);
-      });
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+      if (videoContainerRef.current?.requestFullscreen) {
+        videoContainerRef.current.requestFullscreen().catch(err => {
+          console.error(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+      } else if (videoContainerRef.current?.webkitRequestFullscreen) {
+        // Safari desktop
+        videoContainerRef.current.webkitRequestFullscreen();
+      } else if (videoRef.current?.webkitEnterFullscreen) {
+        // iOS Safari (iPhones only support fullscreen on the video element itself)
+        videoRef.current.webkitEnterFullscreen();
+      }
     } else {
-      document.exitFullscreen();
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      }
     }
   };
 
@@ -350,7 +362,7 @@ export default function WatchRoom() {
         </div>
       </div>
 
-      <div className="main-content-area" style={{ display: 'flex', gap: '1rem', flex: 1, flexDirection: 'row', minHeight: 0 }}>
+      <div className="main-content-area" style={{ display: 'flex', gap: '1rem', flex: 1, minHeight: 0 }}>
         <div className="video-container" ref={videoContainerRef} style={{ flex: 1 }}>
           {!streamActive && (
             <div className="waiting-msg">
